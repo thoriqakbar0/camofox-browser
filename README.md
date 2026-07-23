@@ -15,7 +15,8 @@
 
 <br/>
 
-> **Fork status:** This fork is paired with [thoriqakbar0/agent-browser](https://github.com/thoriqakbar0/agent-browser). That agent-browser fork launches this REST server automatically, creates one isolated Camofox tab per agent-browser session, maps Camofox snapshots to `@eN` refs, and shuts down the owned server on `agent-browser close`. Camofox is the default graphical engine there; Chrome remains available for CDP-only commands.
+> [!IMPORTANT]
+> This fork is the graphical Firefox backend for [thoriqakbar0/agent-browser](https://github.com/thoriqakbar0/agent-browser). That agent-browser fork launches this server automatically and uses Camofox as its default engine.
 
 > <a href="https://askjo.ai?ref=camofox"><img src="jo-logo.png" alt="Jo" width="80" height="80" align="left" /></a>
 >
@@ -28,6 +29,67 @@ git clone https://github.com/jo-inc/camofox-browser && cd camofox-browser
 npm install && npm start
 # -> http://localhost:9377
 ```
+
+---
+
+## agent-browser integration
+
+The paired agent-browser fork turns this REST server into a normal agent-browser engine:
+
+```mermaid
+sequenceDiagram
+    participant Agent
+    participant CLI as agent-browser
+    participant API as Camofox REST server
+    participant Firefox as Camoufox Firefox
+
+    Agent->>CLI: agent-browser open https://example.com
+    CLI->>API: Start server and create isolated tab
+    API->>Firefox: Launch graphical browser page
+    CLI->>API: Navigate, snapshot, click, fill, screenshot
+    API->>Firefox: Execute browser operation
+    Firefox-->>API: Rendered result
+    API-->>CLI: Compact response and element refs
+    Agent->>CLI: agent-browser close
+    CLI->>API: Delete owned user session
+    CLI->>API: Stop owned server
+```
+
+### What agent-browser uses
+
+| Camofox behavior | agent-browser behavior |
+| --- | --- |
+| `POST /tabs` creates a session-isolated browser tab | One tab is created for each agent-browser session |
+| `POST /tabs/:id/navigate` loads a URL | `agent-browser open` and `goto` |
+| `GET /tabs/:id/snapshot` returns accessibility output and refs | `agent-browser snapshot`, normalized to `@eN` refs |
+| Click and type endpoints accept stable refs | `agent-browser click @eN` and `fill @eN` |
+| Screenshot endpoint returns a rendered PNG | `agent-browser screenshot page.png` |
+| Evaluate endpoint executes page JavaScript | URL, title, content, and `eval` commands |
+| Session deletion closes owned browser state | `agent-browser close` |
+
+### Run the paired forks
+
+```bash
+git clone https://github.com/thoriqakbar0/camofox-browser
+git clone https://github.com/thoriqakbar0/agent-browser
+
+cd camofox-browser
+npm install
+
+cd ../agent-browser
+pnpm install
+pnpm build:native
+
+export AGENT_BROWSER_CAMOFOX_EXECUTABLE="$PWD/../camofox-browser/bin/camofox-browser.js"
+./cli/target/release/agent-browser open https://example.com
+./cli/target/release/agent-browser snapshot -i
+./cli/target/release/agent-browser screenshot page.png
+./cli/target/release/agent-browser close
+```
+
+agent-browser can instead attach to an already-running instance with `AGENT_BROWSER_CAMOFOX_URL`. Set `AGENT_BROWSER_CAMOFOX_ACCESS_KEY` on both sides when the server uses access-key protection.
+
+The current integration intentionally covers the everyday graphical path: navigation, rendered page data, evaluation, snapshots, refs, click, fill, screenshots, history, reload, and cleanup. CDP-specific agent-browser commands remain on its explicit Chrome engine.
 
 ---
 
