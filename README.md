@@ -16,7 +16,7 @@
 <br/>
 
 > [!IMPORTANT]
-> This fork is the graphical Firefox backend for [thoriqakbar0/agent-browser](https://github.com/thoriqakbar0/agent-browser). That agent-browser fork launches this server automatically and uses Camofox as its default engine.
+> This fork is the graphical Firefox backend for [Agent Lite](https://github.com/thoriqakbar0/agent-lite). Agent Lite launches this server automatically and uses Camofox as its default engine while keeping `agent-browser` as the CLI command.
 
 > <a href="https://askjo.ai?ref=camofox"><img src="jo-logo.png" alt="Jo" width="80" height="80" align="left" /></a>
 >
@@ -32,14 +32,14 @@ npm install && npm start
 
 ---
 
-## agent-browser integration
+## Agent Lite integration
 
-The paired agent-browser fork turns this REST server into a normal agent-browser engine:
+Agent Lite turns this REST server into a normal `agent-browser` engine:
 
 ```mermaid
 sequenceDiagram
     participant Agent
-    participant CLI as agent-browser
+    participant CLI as Agent Lite / agent-browser
     participant API as Camofox REST server
     participant Firefox as Camoufox Firefox
 
@@ -55,9 +55,9 @@ sequenceDiagram
     CLI->>API: Stop owned server
 ```
 
-### What agent-browser uses
+### What Agent Lite uses
 
-| Camofox behavior | agent-browser behavior |
+| Camofox behavior | Agent Lite behavior |
 | --- | --- |
 | `POST /tabs` creates a session-isolated browser tab | One tab is created for each agent-browser session |
 | `POST /tabs/:id/navigate` loads a URL | `agent-browser open` and `goto` |
@@ -71,12 +71,12 @@ sequenceDiagram
 
 ```bash
 git clone https://github.com/thoriqakbar0/camofox-browser
-git clone https://github.com/thoriqakbar0/agent-browser
+git clone https://github.com/thoriqakbar0/agent-lite
 
 cd camofox-browser
 npm install
 
-cd ../agent-browser
+cd ../agent-lite
 pnpm install
 pnpm build:native
 
@@ -87,9 +87,9 @@ export AGENT_BROWSER_CAMOFOX_EXECUTABLE="$PWD/../camofox-browser/bin/camofox-bro
 ./cli/target/release/agent-browser close
 ```
 
-agent-browser can instead attach to an already-running instance with `AGENT_BROWSER_CAMOFOX_URL`. Set `AGENT_BROWSER_CAMOFOX_ACCESS_KEY` on both sides when the server uses access-key protection.
+Agent Lite can instead attach to an already-running instance with `AGENT_BROWSER_CAMOFOX_URL`. Set `AGENT_BROWSER_CAMOFOX_ACCESS_KEY` on both sides when the server uses access-key protection.
 
-The current integration intentionally covers the everyday graphical path: navigation, rendered page data, evaluation, snapshots, refs, click, fill, screenshots, history, reload, and cleanup. CDP-specific agent-browser commands remain on its explicit Chrome engine.
+The integration covers the everyday graphical path: navigation, rendered page data, evaluation, snapshots, refs, click, fill, screenshots, history, reload, and cleanup. CDP-specific commands remain on Agent Lite’s explicit Chrome engine.
 
 ---
 
