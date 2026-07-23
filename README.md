@@ -15,6 +15,8 @@
 
 <br/>
 
+> **Fork status:** This fork is paired with [thoriqakbar0/agent-browser](https://github.com/thoriqakbar0/agent-browser). That agent-browser fork launches this REST server automatically, creates one isolated Camofox tab per agent-browser session, maps Camofox snapshots to `@eN` refs, and shuts down the owned server on `agent-browser close`. Camofox is the default graphical engine there; Chrome remains available for CDP-only commands.
+
 > <a href="https://askjo.ai?ref=camofox"><img src="jo-logo.png" alt="Jo" width="80" height="80" align="left" /></a>
 >
 > Built by the team behind <a href="https://askjo.ai?ref=camofox"><strong>jo, a personal AI agent</strong></a> that runs half on your Mac, half on a dedicated cloud machine just for you -- with zero maintenance needed. Available on macOS, Telegram, WhatsApp, and email. <a href="https://askjo.ai?ref=camofox">Try the beta free -></a>
